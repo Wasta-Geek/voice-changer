@@ -1,19 +1,14 @@
 #include <iostream>
 #include <thread>
 #include "portaudio.h"
+#define _AMD64_
+#include <windows.h>
 
 constexpr unsigned SAMPLE_RATE = 44100;
 constexpr PaSampleFormat PA_SAMPLE_TYPE = paFloat32;
 constexpr unsigned FRAMES_PER_BUFFER = 64;
 constexpr const char* VIRTUAL_MICROPHONE_DEVICE_NAME = "CABLE Input (VB-Audio Virtual C";
 
-typedef struct
-{
-	float left_phase = 0.0;
-	float right_phase = 0.0;
-	bool ascending = false;
-}
-paTestData;
 
 int patestCallback(const void* inputBuffer, void* outputBuffer,
 	unsigned long framesPerBuffer,
@@ -26,15 +21,13 @@ int patestCallback(const void* inputBuffer, void* outputBuffer,
 	unsigned int i;
 	(void)timeInfo; /* Prevent unused variable warnings. */
 	(void)statusFlags;
-	
-	paTestData * data = (paTestData*)userData;
+
 	for (i = 0; i < framesPerBuffer; i++)
 	{
 		*out++ = *in++;  /* left */
 	}
 	return paContinue;
 }
-static paTestData data;
 
 PaDeviceIndex getDeviceIndexFromName(const char* device_name, PaHostApiIndex device_api)
 {
@@ -70,15 +63,26 @@ PaDeviceIndex getDeviceIndexFromName(const char* device_name, PaHostApiIndex dev
 	return paNoDevice;
 }
 
-int main(void)
+bool initializePortaudio()
 {
 	PaError err = Pa_Initialize();
 	if (err != paNoError)
 	{
 		std::cout << "PortAudio error: " << Pa_GetErrorText(err) << std::endl;
+		return false;
 	}
+	return true;
+}
 
+void clearPortaudio()
+{
+	PaError err = Pa_Terminate();
+	if (err != paNoError)
+		std::cout << "PortAudio error while closing: " << Pa_GetErrorText(err) << std::endl;
+}
 
+bool createStream()
+{
 	PaStream* main_stream;
 
 
@@ -97,7 +101,7 @@ int main(void)
 	if (input_device_index == paNoDevice)
 	{
 		std::cout << "Please make sure you have installed VB virtual audio cable correctly." << std::endl;
-		return 1;
+		return false;
 	}
 
 	PaStreamParameters output_parameters;
@@ -107,32 +111,74 @@ int main(void)
 	output_parameters.hostApiSpecificStreamInfo = NULL;
 	output_parameters.suggestedLatency = Pa_GetDeviceInfo(output_device_index)->defaultLowOutputLatency;
 
-	err = Pa_OpenStream(&main_stream,
+	PaError err = Pa_OpenStream(&main_stream,
 		&input_parameters, &output_parameters,
 		SAMPLE_RATE, paFramesPerBufferUnspecified,
 		paNoFlag,
-		patestCallback, &data);
+		patestCallback, NULL);
 
 	if (err != paNoError)
+	{
 		std::cout << "ERROR DURING OPENING MAIN STREAM: " << Pa_GetErrorText(err) << std::endl;
+		return false;
+	}
 
 
 	err = Pa_StartStream(main_stream);
 
 	if (err != paNoError)
-		std::cout << "ERROR DURING STARTING MAIN STREAM: " << Pa_GetErrorText(err) << std::endl;
-
-
-	for (auto i = 0; i < 10; i++)
 	{
-		std::cout << "Sleeping... " << i << std::endl;
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::cout << "ERROR DURING STARTING MAIN STREAM: " << Pa_GetErrorText(err) << std::endl;
+		return false;
 	}
+	return true;
+}
 
+void loop()
+{
+	if (RegisterHotKey(
+		NULL,
+		1,
+		MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT,
+		VK_F20) && RegisterHotKey(NULL, 2, MOD_CONTROL | MOD_SHIFT | MOD_NOREPEAT, VK_F24))
+	{
+		std::cout << "Hotkeys registered: loop starts now." << std::endl;
 
-	err = Pa_Terminate();
-	if (err != paNoError)
-		std::cout << "PortAudio error while closing: " << Pa_GetErrorText(err) << std::endl;
+		MSG msg = { 0 };
+		while (GetMessage(&msg, NULL, 0, 0) != 0)
+		{
+			if (msg.message == WM_HOTKEY)
+			{
+				switch (msg.wParam)
+				{
+				case 1: /// G1
+					break;
+				case 2:  /// G6
+					return;
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
 
+int main(void)
+{
+	if (!initializePortaudio())
+		return 1;
+
+	if (!createStream())
+		return 2;
+
+	//f/*or (auto i = 0; i < 10; i++)
+	//{
+	//	std::cout << "Sleeping... " << i << std::endl;
+
+	//	std::this_thread::sleep_for(std::chrono::seconds(1));
+	//}*/
+
+	loop();
+	clearPortaudio();
 	return 0;
 }
