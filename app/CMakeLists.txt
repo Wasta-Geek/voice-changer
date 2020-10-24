@@ -6,8 +6,16 @@ cmake_minimum_required (VERSION 3.8)
 project ("voice-changer")
 
 include_directories(includes)
+
 set(SOURCE_FILES
-sources/main.cpp)
+sources/main.cpp
+sources/VoiceChangerApp.cpp
+sources/PortAudioWrapper.cpp)
+
+set(INCLUDE_FILES
+includes/VoiceChangerApp.hpp
+includes/PortAudioWrapper.hpp
+)
 
 add_executable(${PROJECT_NAME}  ${SOURCE_FILES})
 
