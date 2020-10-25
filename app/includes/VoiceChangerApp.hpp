@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "PortAudioWrapper.hpp"
+#include "HotKeyManager.hpp"
 
 namespace Chelmi
 {
@@ -15,6 +16,9 @@ namespace Chelmi
 		void quit();
 
 	private:
+		void _show();
+
 		PortAudioWrapper _port_audio_wrapper;
+		HotKeyManager _hotkey_manager;
 	};
 }

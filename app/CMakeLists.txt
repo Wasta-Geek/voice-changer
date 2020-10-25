@@ -10,11 +10,13 @@ include_directories(includes)
 set(SOURCE_FILES
 sources/main.cpp
 sources/VoiceChangerApp.cpp
-sources/PortAudioWrapper.cpp)
+sources/PortAudioWrapper.cpp
+sources/HotKeyManager.cpp)
 
 set(INCLUDE_FILES
 includes/VoiceChangerApp.hpp
 includes/PortAudioWrapper.hpp
+includes/HotKeyManager.hpp
 )
 
 add_executable(${PROJECT_NAME}  ${SOURCE_FILES})
