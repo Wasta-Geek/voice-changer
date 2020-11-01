@@ -45,6 +45,7 @@ namespace Chelmi
 
 	bool HotKeyManager::addHotkeyEvent(const HotKeyEvent& event)
 	{
+		// Should change to keyboard hook to be notified of release
 		if (RegisterHotKey(
 			NULL,
 			event.key_code,

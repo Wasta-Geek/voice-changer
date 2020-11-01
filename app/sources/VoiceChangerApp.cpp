@@ -19,7 +19,11 @@ namespace Chelmi
 	bool VoiceChangerApp::initialize()
 	{
 		bool port_audio_initialized = _port_audio_wrapper.initialize() && _port_audio_wrapper.createStream();
-		bool hotkey_manager_initialized = _hotkey_manager.addHotkeyEvent({ VK_F20, std::bind(&VoiceChangerApp::_show, this) })
+		bool hotkey_manager_initialized = _hotkey_manager.addHotkeyEvent({ VK_F19, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "LE QUOI.wav") })
+			&& _hotkey_manager.addHotkeyEvent({ VK_F20, std::bind(&VoiceChangerApp::_show, this) })
+			&& _hotkey_manager.addHotkeyEvent({ VK_F21, std::bind(&VoiceChangerApp::_show, this) })
+			&& _hotkey_manager.addHotkeyEvent({ VK_F22, std::bind(&VoiceChangerApp::_show, this) })
+			&& _hotkey_manager.addHotkeyEvent({ VK_F23, std::bind(&VoiceChangerApp::_show, this) })
 			&& _hotkey_manager.addHotkeyEvent({ VK_F24, std::bind(&VoiceChangerApp::quit, this) });
 		return port_audio_initialized && hotkey_manager_initialized;
 	}
@@ -36,6 +40,11 @@ namespace Chelmi
 
 	void VoiceChangerApp::_show()
 	{
-		std::cout << "SHOW" << std::endl;
+		std::cout << "DUMMY" << std::endl;
+	}
+
+	bool VoiceChangerApp::_playFile(e_FileFormat file_format, const std::string &file_path)
+	{
+		return _file_player_manager.playFile(file_format, file_path);
 	}
 }
