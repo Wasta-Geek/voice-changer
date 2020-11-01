@@ -29,14 +29,14 @@ namespace Chelmi
 
 		PaStreamParameters input_parameters;
 		input_parameters.device = input_device_index;
-		input_parameters.channelCount = 1;
+		input_parameters.channelCount = NUMBER_OF_CHANNELS;
 		input_parameters.sampleFormat = paFloat32;
 		input_parameters.hostApiSpecificStreamInfo = NULL;
 		input_parameters.suggestedLatency = Pa_GetDeviceInfo(input_device_index)->defaultLowInputLatency;
 
 
 
-		PaDeviceIndex output_device_index = _getDeviceIndexFromName(VIRTUAL_MICROPHONE_DEVICE_NAME, paInDevelopment);
+		PaDeviceIndex output_device_index = _getDeviceIndexFromName(VIRTUAL_MICROPHONE_DEVICE_NAME.c_str(), paInDevelopment);
 		if (input_device_index == paNoDevice)
 		{
 			std::cout << "Please make sure you have installed VB virtual audio cable correctly." << std::endl;
@@ -45,7 +45,7 @@ namespace Chelmi
 
 		PaStreamParameters output_parameters;
 		output_parameters.device = output_device_index;
-		output_parameters.channelCount = 1;
+		output_parameters.channelCount = NUMBER_OF_CHANNELS;
 		output_parameters.sampleFormat = paFloat32;
 		output_parameters.hostApiSpecificStreamInfo = NULL;
 		output_parameters.suggestedLatency = Pa_GetDeviceInfo(output_device_index)->defaultLowOutputLatency;
@@ -114,8 +114,7 @@ namespace Chelmi
 		unsigned int i;
 		(void)timeInfo; /* Prevent unused variable warnings. */
 		(void)statusFlags;
-
-		for (i = 0; i < framesPerBuffer; i++)
+		for (i = 0; i < framesPerBuffer * NUMBER_OF_CHANNELS; i++)
 		{
 			*out++ = *in++;  /* left */
 		}
