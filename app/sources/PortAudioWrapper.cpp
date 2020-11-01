@@ -3,6 +3,9 @@
 
 namespace Chelmi
 {
+	PortAudioWrapper::PortAudioWrapper(FilePlayerManager& file_player_manager) : _user_data({ file_player_manager })
+	{ }
+
 	PortAudioWrapper::~PortAudioWrapper()
 	{
 		PaError err = Pa_Terminate();
@@ -54,7 +57,7 @@ namespace Chelmi
 			&input_parameters, &output_parameters,
 			SAMPLE_RATE, paFramesPerBufferUnspecified,
 			paNoFlag,
-			&PortAudioWrapper::_portAudioCallback, this);
+			&PortAudioWrapper::_portAudioCallback, &this->_user_data);
 
 		if (err != paNoError)
 		{
@@ -107,16 +110,39 @@ namespace Chelmi
 		return paNoDevice;
 	}
 
-	int PortAudioWrapper::_portAudioCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData)
+	int PortAudioWrapper::_portAudioCallback(const void* input_buffer, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* raw_user_data)
 	{
-		float* out = (float*)outputBuffer;
-		const float* in = (const float*)inputBuffer;
+		float* out = (float*)output_buffer;
+		const float* in = (const float*)input_buffer;
 		unsigned int i;
 		(void)timeInfo; /* Prevent unused variable warnings. */
 		(void)statusFlags;
-		for (i = 0; i < framesPerBuffer * NUMBER_OF_CHANNELS; i++)
+
+
+		if (raw_user_data == nullptr)
 		{
-			*out++ = *in++;  /* left */
+			for (i = 0; i < frames_per_buffer * NUMBER_OF_CHANNELS; i++)
+			{
+				* out++ = *in++;  /* left */
+			}
+		}
+		else
+		{
+			UserData* user_data = static_cast<UserData*>(raw_user_data);
+			for (i = 0; i < frames_per_buffer * NUMBER_OF_CHANNELS; i++)
+			{
+				float output_value = *in++;
+				auto &file_samples_list =  user_data->file_player_manager.getCurrentFileSamples();
+				for (auto& _file_samples : file_samples_list)
+				{
+					if (_file_samples.availableSample())
+					{
+						output_value += _file_samples.consumeNextSample() * 0.4;
+					}
+				}
+				user_data->file_player_manager.clearAlreadyReadFileSamples();
+				*out++ = output_value;
+			}
 		}
 		return paContinue;
 	}

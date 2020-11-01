@@ -19,7 +19,7 @@ includes/VoiceChangerApp.hpp
 includes/PortAudioWrapper.hpp
 includes/HotKeyManager.hpp
 includes/AvailableEffects.hpp
-includes/FilePlayerManager.hpp "includes/FileFormats.hpp")
+includes/FilePlayerManager.hpp "includes/FileFormats.hpp" "includes/UserData.hpp")
 
 add_executable(${PROJECT_NAME}  ${SOURCE_FILES} ${INCLUDE_FILES})
 

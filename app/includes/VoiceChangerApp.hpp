@@ -22,8 +22,8 @@ namespace Chelmi
 
 
 		PortAudioWrapper _port_audio_wrapper;
-		HotKeyManager _hotkey_manager;
 		FilePlayerManager _file_player_manager;
+		HotKeyManager _hotkey_manager;
 		//std::array<AEffect, 4> _favorite_effects;
 	};
 }
