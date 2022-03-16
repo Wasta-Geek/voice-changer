@@ -19,6 +19,7 @@ namespace Chelmi
 	private:
 		void _show();
 		bool _playFile(e_FileFormat file_format, const std::string& file_path);
+		void _clearAllFuturesEffects();
 
 
 		PortAudioWrapper _port_audio_wrapper;

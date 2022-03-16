@@ -34,6 +34,7 @@ namespace Chelmi
 		bool playFile(e_FileFormat file_format, const std::string& relative_file_path);
 		std::list<FileSamples> &getCurrentFileSamples();
 		void clearAlreadyReadFileSamples();
+		void clearAllFileSamples();
 	private:
 		void _playWavFile(const std::string& relative_file_path, std::promise<bool> play_file_future);
 		void _addFileSample(FileSamples &&file_samples);

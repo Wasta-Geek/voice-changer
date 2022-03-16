@@ -51,6 +51,12 @@ namespace Chelmi
 		//});
 	}
 
+	void FilePlayerManager::clearAllFileSamples()
+	{
+		std::scoped_lock lock(_mutex);
+		_current_file_samples.clear();
+	}
+
 	void FilePlayerManager::_playWavFile(const std::string& relative_file_path, std::promise<bool> play_file_future)
 	{
 		SF_INFO info;

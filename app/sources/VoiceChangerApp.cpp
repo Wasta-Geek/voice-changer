@@ -67,6 +67,8 @@ namespace Chelmi
 			&& _hotkey_manager.addHotkeyEvent({ VK_F21, false, false, true, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "Mais t'es pas net nan.wav") })
 			&& _hotkey_manager.addHotkeyEvent({ VK_F22, false, false, true, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "Mais moi je veux faire l'amour.wav") })
 			&& _hotkey_manager.addHotkeyEvent({ VK_F23, false, false, true, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "T'es un malade Bernard.wav") })
+			// Keyboard macros
+			&& _hotkey_manager.addHotkeyEvent({ VK_F24, true, true, false, std::bind(&VoiceChangerApp::_clearAllFuturesEffects, this) })
 			;
 
 
@@ -91,5 +93,10 @@ namespace Chelmi
 	bool VoiceChangerApp::_playFile(e_FileFormat file_format, const std::string &file_path)
 	{
 		return _file_player_manager.playFile(file_format, file_path);
+	}
+
+	void VoiceChangerApp::_clearAllFuturesEffects()
+	{
+		_file_player_manager.clearAllFileSamples();
 	}
 }
