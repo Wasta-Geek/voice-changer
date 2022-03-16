@@ -137,7 +137,7 @@ namespace Chelmi
 				{
 					if (_file_samples.availableSample())
 					{
-						output_value += _file_samples.consumeNextSample() * 0.4;
+						output_value += _file_samples.consumeNextSample() * 0.5;
 					}
 				}
 				user_data->file_player_manager.clearAlreadyReadFileSamples();

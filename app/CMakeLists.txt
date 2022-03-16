@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("voice-changer")
+project ("voice-changer" VERSION 0.0.2)
 
 include_directories(includes)
 
