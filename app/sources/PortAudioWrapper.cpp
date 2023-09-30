@@ -3,7 +3,7 @@
 
 namespace Chelmi
 {
-	PortAudioWrapper::PortAudioWrapper(FilePlayerManager& file_player_manager) : _user_data({ file_player_manager })
+	PortAudioWrapper::PortAudioWrapper()
 	{ }
 
 	PortAudioWrapper::~PortAudioWrapper()
@@ -76,6 +76,12 @@ namespace Chelmi
 		return true;
 	}
 
+	void PortAudioWrapper::addAudioSampleProducer(AAudioSampleProducer& audio_sample_producer)
+	{
+		_user_data.audio_sample_producers.push_back(audio_sample_producer);
+	}
+
+
 	PaDeviceIndex PortAudioWrapper::_getDeviceIndexFromName(const char* device_name, PaHostApiIndex device_api) const
 	{
 		int numDevices;
@@ -123,25 +129,28 @@ namespace Chelmi
 		{
 			for (i = 0; i < frames_per_buffer * NUMBER_OF_CHANNELS; i++)
 			{
-				* out++ = *in++;  /* left */
+				*out++ = *in++;  /* left */
 			}
 		}
 		else
 		{
 			UserData* user_data = static_cast<UserData*>(raw_user_data);
-			for (i = 0; i < frames_per_buffer * NUMBER_OF_CHANNELS; i++)
+			for (auto &&audio_sample_producer : user_data->audio_sample_producers)
 			{
-				float output_value = *in++;
-				auto &file_samples_list =  user_data->file_player_manager.getCurrentFileSamples();
-				for (auto& _file_samples : file_samples_list)
+				for (i = 0; i < frames_per_buffer * NUMBER_OF_CHANNELS; i++)
 				{
-					if (_file_samples.availableSample())
+					float output_value = *in++;
+					auto& audio_samples_list = audio_sample_producer.get().getCurrentAudioSamples();
+					for (auto& audio_samples : audio_samples_list)
 					{
-						output_value += _file_samples.consumeNextSample() * 0.5;
+						if (audio_samples.availableSample())
+						{
+							output_value += audio_samples.consumeNextSample() * 0.5f;
+						}
 					}
+					audio_sample_producer.get().clearAlreadyReadAudioSamples();
+					*out++ = output_value;
 				}
-				user_data->file_player_manager.clearAlreadyReadFileSamples();
-				*out++ = output_value;
 			}
 		}
 		return paContinue;

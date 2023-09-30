@@ -9,9 +9,10 @@ namespace Chelmi
 	class PortAudioWrapper
 	{
 	public:
-		PortAudioWrapper(FilePlayerManager &file_player_manager);
+		PortAudioWrapper();
 		~PortAudioWrapper();
 		bool initialize();
+		void addAudioSampleProducer(AAudioSampleProducer& audio_sample_producer);
 		bool createStream();
 
 		static inline unsigned SAMPLE_RATE = 44100;
@@ -24,6 +25,5 @@ namespace Chelmi
 		static int _portAudioCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 
 		UserData _user_data;
-		//FilePlayerManager &_file_player_manager;
 	};
 }

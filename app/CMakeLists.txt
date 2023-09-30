@@ -12,16 +12,25 @@ sources/main.cpp
 sources/VoiceChangerApp.cpp
 sources/PortAudioWrapper.cpp
 sources/HotKeyManager.cpp
-sources/FilePlayerManager.cpp)
+sources/FilePlayerManager.cpp
+sources/effects/EchoEffect.cpp
+sources/EffectManager.cpp
+sources/AAudioSampleProducer.cpp "sources/effects/AEffect.cpp")
 
 set(INCLUDE_FILES
 includes/VoiceChangerApp.hpp
 includes/PortAudioWrapper.hpp
 includes/HotKeyManager.hpp
-includes/AvailableEffects.hpp
-includes/FilePlayerManager.hpp "includes/FileFormats.hpp" "includes/UserData.hpp")
+includes/effects/AEffect.hpp
+includes/effects/EchoEffect.hpp
+includes/FilePlayerManager.hpp
+includes/FileFormats.hpp
+includes/UserData.hpp
+includes/EffectManager.hpp
+includes/AudioSample.hpp
+includes/AAudioSampleProducer.hpp)
 
-add_executable(${PROJECT_NAME}  ${SOURCE_FILES} ${INCLUDE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${INCLUDE_FILES})
 
 set(RESOURCES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 set(DEPENDENCIES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependencies)

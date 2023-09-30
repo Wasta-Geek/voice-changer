@@ -1,13 +1,16 @@
 ﻿// voice-changer.cpp : définit le point d'entrée de l'application.
 //
 
+#include <iostream>
+#include <vector>
 #include "VoiceChangerApp.hpp"
 
 namespace Chelmi
 {
-	VoiceChangerApp::VoiceChangerApp(): _port_audio_wrapper(_file_player_manager)
+	VoiceChangerApp::VoiceChangerApp()
 	{
-
+		_port_audio_wrapper.addAudioSampleProducer(_file_player_manager);
+		_port_audio_wrapper.addAudioSampleProducer(_effect_manager);
 	}
 
 	VoiceChangerApp::~VoiceChangerApp()
@@ -68,7 +71,10 @@ namespace Chelmi
 			&& _hotkey_manager.addHotkeyEvent({ VK_F22, false, false, true, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "Mais moi je veux faire l'amour.wav") })
 			&& _hotkey_manager.addHotkeyEvent({ VK_F23, false, false, true, std::bind(&VoiceChangerApp::_playFile, this, e_FileFormat::WAV, "T'es un malade Bernard.wav") })
 			// Keyboard macros
+			//&& _hotkey_manager.addHotkeyEvent({ VK_F24, true, true, false, std::bind(&VoiceChangerApp::_recordEffects, this) })
 			&& _hotkey_manager.addHotkeyEvent({ VK_F24, true, true, false, std::bind(&VoiceChangerApp::_clearAllFuturesEffects, this) })
+			// Numeric macros
+			&& _hotkey_manager.addHotkeyEvent({ VK_F13, true, false, true, std::bind(&VoiceChangerApp::_applyEffect, this, e_effect::ECHO) })
 			;
 
 
@@ -97,6 +103,11 @@ namespace Chelmi
 
 	void VoiceChangerApp::_clearAllFuturesEffects()
 	{
-		_file_player_manager.clearAllFileSamples();
+		_file_player_manager.clearAllAudioSamples();
+	}
+
+	void VoiceChangerApp::_applyEffect(e_effect effect)
+	{
+		_effect_manager.applyEffect(effect);
 	}
 }

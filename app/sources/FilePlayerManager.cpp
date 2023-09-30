@@ -32,31 +32,6 @@ namespace Chelmi
 		return false;
 	}
 
-	std::list<FileSamples>& FilePlayerManager::getCurrentFileSamples()
-	{
-		return _current_file_samples;
-	}
-
-	void FilePlayerManager::clearAlreadyReadFileSamples()
-	{
-		//std::async(std::launch::async, [=]() {
-		std::scoped_lock lock(_mutex);
-		_current_file_samples.erase(
-			std::remove_if(_current_file_samples.begin(),
-				_current_file_samples.end(),
-				[](const FileSamples& file_samples) {
-			if (!file_samples.availableSample())
-				std::cout << "remove ! " << std::endl;
-			return !file_samples.availableSample(); }), _current_file_samples.end());
-		//});
-	}
-
-	void FilePlayerManager::clearAllFileSamples()
-	{
-		std::scoped_lock lock(_mutex);
-		_current_file_samples.clear();
-	}
-
 	void FilePlayerManager::_playWavFile(const std::string& relative_file_path, std::promise<bool> play_file_future)
 	{
 		SF_INFO info;
@@ -73,21 +48,15 @@ namespace Chelmi
 
 		sf_count_t frames_read = sf_readf_float(file, samples.get(), info.frames);
 
-		FileSamples file_samples;
+		AudioSample file_samples;
 		file_samples.samples = std::move(samples);
 		file_samples.samples_number = static_cast<unsigned long>(info.frames);
 
-		_addFileSample(std::move(file_samples));
+		this->addFileSample(std::move(file_samples));
 
 		if (sf_close(file) != SF_ERR_NO_ERROR)
 		{
 			std::cerr << sf_strerror(file) << absolute_file_path << std::endl;
 		}
-	}
-
-	void FilePlayerManager::_addFileSample(FileSamples&& file_samples)
-	{
-		std::scoped_lock lock(_mutex);
-		_current_file_samples.emplace_back(std::forward<FileSamples>(file_samples));
 	}
 }

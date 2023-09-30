@@ -1,11 +1,12 @@
 #pragma once
 
-#include "FilePlayerManager.hpp"
+#include<functional>
+#include "AAudioSampleProducer.hpp"
 
 namespace Chelmi
 {
 	struct UserData
 	{
-		FilePlayerManager& file_player_manager;
+		std::vector<std::reference_wrapper<AAudioSampleProducer>> audio_sample_producers;
 	};
 }
